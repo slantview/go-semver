@@ -2,6 +2,7 @@
 
 [![Build Status](https://travis-ci.org/slantview/go-semver.png)](https://travis-ci.org/slantview/go-semver)
 [![Coverage Status](https://coveralls.io/repos/slantview/go-semver/badge.png?branch=master)](https://coveralls.io/r/slantview/go-semver?branch=master)
+[![GoDoc](https://godoc.org/github.com/slantview/go-semver?status.png)](http://godoc.org/github.com/slantview/go-semver)
 
 A library for using [semantic versioning](http://semver.org/) in Go.
 
