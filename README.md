@@ -33,10 +33,10 @@ fmt.Printf("%s", s.String())
 
 s.SetBuild("build")
 fmt.Printf("%s", s.String())
-// "2.0.0-build.1"
+// "2.0.0+build.1"
 
 s.BumpBuild()
 fmt.Printf("%s", s.String())
-// "2.0.0-build.2"
+// "2.0.0+build.2"
 
 ```
