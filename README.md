@@ -8,7 +8,10 @@ A library for using [semantic versioning](http://semver.org/) in Go.
 
 ```go
 
-s := semver.NewVersion("1.0.0")
+s, err := semver.NewVersion("1.0.0")
+if err != nil {
+    fmt.Printf("Unable to parse version: %s", err)
+}
 
 fmt.Printf("%s", s.String())
 // "1.0.0"
