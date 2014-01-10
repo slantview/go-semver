@@ -1,6 +1,7 @@
 # go-semver
 
 [![Build Status](https://travis-ci.org/slantview/go-semver.png)](https://travis-ci.org/slantview/go-semver)
+[![Coverage Status](https://coveralls.io/repos/slantview/go-semver/badge.png?branch=master)](https://coveralls.io/r/slantview/go-semver?branch=master)
 
 A library for using [semantic versioning](http://semver.org/) in Go.
 
@@ -45,3 +46,5 @@ fmt.Printf("%s", s.String())
 // "2.0.0+build.2"
 
 ```
+
+Author: Steve Rude <steve@slantview.com>
