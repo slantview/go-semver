@@ -36,7 +36,7 @@ s.BumpPrerelease()
 fmt.Printf("%s", s.String())
 // "2.0.0-alpha.2"
 
-s.SetBuild("build")
+s.SetMetadata("build")
 fmt.Printf("%s", s.String())
 // "2.0.0+build.1"
 
