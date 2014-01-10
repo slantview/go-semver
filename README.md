@@ -1,6 +1,6 @@
 # go-semver
 
-A library for using (semantic versioning)[http://semver.org/] in Go.
+A library for using [semantic versioning](http://semver.org/) in Go.
 
 ## Example Usage
 
