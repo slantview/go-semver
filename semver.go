@@ -200,9 +200,9 @@ func (v *Version) LessThan(v2 *Version) bool {
 func (v *Version) GreaterThan(v2 *Version) bool {
     if v.Major > v2.Major {
         return true
-    } else if v.Minor > v2.Minor {
+    } else if (v.Major == v2.Major) && v.Minor > v2.Minor {
         return true
-    } else if v.Patch > v2.Patch {
+    } else if (v.Major == v2.Major) && (v.Minor == v2.Minor) && v.Patch > v2.Patch {
         return true
     } else if v.PrereleaseType == "" && v2.PrereleaseType != "" {
         return true

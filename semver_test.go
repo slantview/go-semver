@@ -179,6 +179,8 @@ func TestGreaterThan(t *testing.T) {
     }
 
     var versions_fail = []string{
+        "0.0.1",         // Patch
+        "0.1.0",         // Minor
         "1.0.0-alpha.1", // Prerelease
         "1.0.0+build.1", // Metadata
     }
