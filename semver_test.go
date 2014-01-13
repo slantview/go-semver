@@ -248,4 +248,14 @@ func TestEquals(t *testing.T) {
             t.Fatalf("v1 (%s) should equal v2 (%s).", v1.String(), v2.String())
         }
     }
+
+    v1, _ := NewVersion(BASE_VERSION)
+
+    for i := range versions {
+        v2, _ := NewVersion(versions[i])
+
+        if v1.Equals(v2) {
+            t.Fatalf("v1 (%s) should not equal v2 (%s).", v1.String(), v2.String())
+        }
+    }
 }

@@ -221,7 +221,7 @@ func (v *Version) GreaterThan(v2 *Version) bool {
 
 func (v *Version) Equals(v2 *Version) bool {
     if (v.Major == v2.Major && v.Minor == v2.Minor && v.Patch == v2.Patch) &&
-        ((v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount == v2.PrereleaseCount) ||
+        ((v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount == v2.PrereleaseCount) &&
             (v.Metadata == v2.Metadata && v.MetadataCount == v2.MetadataCount)) {
         return true
     } else {
