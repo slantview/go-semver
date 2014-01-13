@@ -7,7 +7,7 @@ import (
     "strconv"
 )
 
-var (
+const (
     MAJOR_VERSION      = 1
     MINOR_VERSION      = 2
     PATCH_VERSION      = 4
@@ -173,4 +173,58 @@ func (v *Version) String() string {
     }
 
     return out
+}
+
+func (v *Version) LessThan(v2 *Version) bool {
+    if v.Major > v2.Major {
+        return false
+    } else if v.Minor > v2.Minor {
+        return false
+    } else if v.Patch > v2.Patch {
+        return false
+    } else if v.PrereleaseType == "" && v2.PrereleaseType != "" {
+        return false
+    } else if v.PrereleaseType > v2.PrereleaseType && (v.PrereleaseType != "" && v2.PrereleaseType != "") {
+        return false
+    } else if v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount > v2.PrereleaseCount {
+        return false
+    } else if v.Metadata == "" && v2.Metadata != "" {
+        return false
+    } else if v.Metadata == v2.Metadata && v.MetadataCount > v2.MetadataCount {
+        return false
+    } else {
+        return true
+    }
+}
+
+func (v *Version) GreaterThan(v2 *Version) bool {
+    if v.Major > v2.Major {
+        return true
+    } else if v.Minor > v2.Minor {
+        return true
+    } else if v.Patch > v2.Patch {
+        return true
+    } else if v.PrereleaseType == "" && v2.PrereleaseType != "" {
+        return true
+    } else if (v.PrereleaseType > v2.PrereleaseType) && (v.PrereleaseType != "" && v2.PrereleaseType != "") {
+        return true
+    } else if v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount > v2.PrereleaseCount {
+        return true
+    } else if v.Metadata == "" && v2.Metadata != "" {
+        return true
+    } else if v.Metadata == v2.Metadata && v.MetadataCount > v2.MetadataCount {
+        return true
+    } else {
+        return false
+    }
+}
+
+func (v *Version) Equals(v2 *Version) bool {
+    if (v.Major == v2.Major && v.Minor == v2.Minor && v.Patch == v2.Patch) &&
+        ((v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount == v2.PrereleaseCount) ||
+            (v.Metadata == v2.Metadata && v.MetadataCount == v2.MetadataCount)) {
+        return true
+    } else {
+        return false
+    }
 }

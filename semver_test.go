@@ -170,3 +170,82 @@ func TestAllFields(t *testing.T) {
         t.Fatalf("MetadataCount should be 1, got %d", s.MetadataCount)
     }
 }
+
+func TestGreaterThan(t *testing.T) {
+    var versions = []string{
+        "1.0.1", // Patch
+        "1.1.0", // Minor
+        "2.0.0", // Major
+    }
+
+    var versions_fail = []string{
+        "1.0.0-alpha.1", // Prerelease
+        "1.0.0+build.1", // Metadata
+    }
+
+    v1, _ := NewVersion(BASE_VERSION)
+
+    for i := range versions {
+        v2, _ := NewVersion(versions[i])
+        if v1.GreaterThan(v2) {
+            t.Fatalf("v2 (%s) should be greater than v1 (%s).", v2.String(), v1.String())
+        }
+    }
+
+    for i := range versions_fail {
+        v2, _ := NewVersion(versions_fail[i])
+        if v2.GreaterThan(v1) {
+            t.Fatalf("v1 (%s) should be greater than v2 (%s).", v1.String(), v2.String())
+        }
+
+    }
+}
+
+func TestLessThan(t *testing.T) {
+    var versions = []string{
+        "1.0.1", // Patch
+        "1.1.0", // Minor
+        "2.0.0", // Major
+    }
+
+    var versions_fail = []string{
+        "1.0.0-alpha.1", // Prerelease
+        "1.0.0+build.1", // Metadata
+    }
+
+    v1, _ := NewVersion(BASE_VERSION)
+
+    for i := range versions {
+        v2, _ := NewVersion(versions[i])
+        if v2.LessThan(v1) {
+            t.Fatalf("v1 (%s) should be less than v2 (%s).", v1.String(), v2.String())
+        }
+    }
+
+    for i := range versions_fail {
+        v2, _ := NewVersion(versions_fail[i])
+        if v1.LessThan(v2) {
+            t.Fatalf("v2 (%s) should be less than v1 (%s).", v2.String(), v1.String())
+        }
+
+    }
+}
+
+func TestEquals(t *testing.T) {
+    var versions = []string{
+        "1.0.1",         // Patch
+        "1.1.0",         // Minor
+        "2.0.0",         // Major
+        "1.0.0-alpha.1", // Prerelease
+        "1.0.0+build.1", // Metadata
+    }
+
+    for i := range versions {
+        v1, _ := NewVersion(versions[i])
+        v2, _ := NewVersion(versions[i])
+
+        if !v1.Equals(v2) {
+            t.Fatalf("v1 (%s) should equal v2 (%s).", v1.String(), v2.String())
+        }
+    }
+}

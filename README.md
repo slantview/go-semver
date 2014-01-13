@@ -46,6 +46,13 @@ s.BumpBuild()
 fmt.Printf("%s", s.String())
 // "2.0.0+build.2"
 
+v1, _ := semver.NewVersion("1.0.0")
+v2, _ := semver.NewVersion("1.0.1")
+
+v1.LessThan(v2) // true
+v1.GreaterThan(v2) // false
+v1.Equals(v2) // false
+
 ```
 
 Author: Steve Rude <steve@slantview.com>
