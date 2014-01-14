@@ -13,6 +13,7 @@ var (
     BUMP_BUILD_VERSION      = "1.0.0+build.2"
     ALL_FIELDS_VERSION      = "1.0.0-alpha.1+build.1"
     INVALID_VERSION         = "zxv8d"
+    EMPTY_VERSION           = ""
 )
 
 func TestNewSemver(t *testing.T) {
@@ -28,6 +29,11 @@ func TestNewSemver(t *testing.T) {
     _, err2 := NewVersion(INVALID_VERSION)
     if err2 == nil {
         t.Fatalf("Should throw error on invalid version.")
+    }
+
+    _, err3 := NewVersion(EMPTY_VERSION)
+    if err3 == nil {
+        t.Fatalf("Should throw error on empty version.")
     }
 }
 
@@ -220,103 +226,11 @@ func TestAllFields(t *testing.T) {
     }
 
     if s.Metadata != "build" {
-        t.Fatalf("Metadata should be alpha, got %s", s.Metadata)
+        t.Fatalf("Metadata should be build, got %s", s.Metadata)
     }
 
     if s.MetadataCount != 1 {
         t.Fatalf("MetadataCount should be 1, got %d", s.MetadataCount)
-    }
-}
-
-func TestGreaterThan(t *testing.T) {
-    var versions = []string{
-        "1.0.1", // Patch
-        "1.1.0", // Minor
-        "2.0.0", // Major
-        "1.1.5",
-        "2.10.0",
-    }
-
-    var versions_fail = []string{
-        "0.0.1",          // Patch
-        "0.1.0",          // Minor
-        "1.0.0-alpha.1",  // Prerelease
-        "1.0.0+build.1",  // Metadata
-        "1.0.0-beta.3",   // Prerelease
-        "1.0.0+d34db33f", // Metadata
-    }
-
-    v1, _ := NewVersion(BASE_VERSION)
-
-    for i := range versions {
-        v2, _ := NewVersion(versions[i])
-        if v1.GreaterThan(v2) {
-            t.Fatalf("v2 (%s) should be greater than v1 (%s).", v2.String(), v1.String())
-        }
-    }
-
-    for i := range versions {
-        v2, _ := NewVersion(versions[i])
-        if !v2.GreaterThan(v1) {
-            t.Fatalf("v2 (%s) should be greater than v1 (%s).", v2.String(), v1.String())
-        }
-    }
-
-    for i := range versions_fail {
-        v2, _ := NewVersion(versions_fail[i])
-        if v2.GreaterThan(v1) {
-            t.Fatalf("v1 (%s) should be greater than v2 (%s).", v1.String(), v2.String())
-        }
-    }
-
-    for i := range versions_fail {
-        v2, _ := NewVersion(versions_fail[i])
-        if !v1.GreaterThan(v2) {
-            t.Fatalf("v1 (%s) should be greater than v2 (%s).", v1.String(), v2.String())
-        }
-    }
-}
-
-func TestLessThan(t *testing.T) {
-    var versions = []string{
-        "1.0.1", // Patch
-        "1.1.0", // Minor
-        "2.0.0", // Major
-    }
-
-    var versions_fail = []string{
-        "1.0.0-alpha.1", // Prerelease
-        "1.0.0+build.1", // Metadata
-    }
-
-    v1, _ := NewVersion(BASE_VERSION)
-
-    for i := range versions {
-        v2, _ := NewVersion(versions[i])
-        if v2.LessThan(v1) {
-            t.Fatalf("v1 (%s) should be less than v2 (%s).", v1.String(), v2.String())
-        }
-    }
-
-    for i := range versions {
-        v2, _ := NewVersion(versions[i])
-        if !v1.LessThan(v2) {
-            t.Fatalf("v1 (%s) should be less than v2 (%s).", v1.String(), v2.String())
-        }
-    }
-
-    for i := range versions_fail {
-        v2, _ := NewVersion(versions_fail[i])
-        if v1.LessThan(v2) {
-            t.Fatalf("v2 (%s) should be less than v1 (%s).", v2.String(), v1.String())
-        }
-    }
-
-    for i := range versions_fail {
-        v2, _ := NewVersion(versions_fail[i])
-        if !v2.LessThan(v1) {
-            t.Fatalf("v2 (%s) should be less than v1 (%s).", v2.String(), v1.String())
-        }
     }
 }
 
@@ -326,7 +240,6 @@ func TestEquals(t *testing.T) {
         "1.1.0",                // Minor
         "2.0.0",                // Major
         "1.0.0-alpha.1",        // Prerelease
-        "1.0.0+build.1",        // Metadata
         "1.0.0-beta.1+build.3", // Prerelease + Metadata
     }
 
@@ -360,6 +273,15 @@ func TestEquals(t *testing.T) {
                 }
             }
         }
+    }
+}
+
+func TestEqualsWithMetadata(t *testing.T) {
+    v1, _ := NewVersion(BASE_VERSION)
+    v2, _ := NewVersion("1.0.0+build.1")
+
+    if !v1.Equals(v2) {
+        t.Fatalf("v1 (%s) should equal v2 (%s) with differing metadata.", v1.String(), v2.String())
     }
 }
 

@@ -1,3 +1,4 @@
+// Package semver provides a semantic versioning library for Go.
 package semver
 
 import (
@@ -26,6 +27,7 @@ type Version struct {
     MetadataCount   int64
 }
 
+// Create a new version object from a string.
 func NewVersion(version string) (*Version, error) {
     v := &Version{0, 0, 1, "", 0, "", 0}
 
@@ -37,6 +39,7 @@ func NewVersion(version string) (*Version, error) {
     return v, nil
 }
 
+// Reset resets the version to a default version of 0.0.1.
 func (v *Version) Reset() {
     v.Major = 0
     v.Minor = 0
@@ -47,6 +50,8 @@ func (v *Version) Reset() {
     v.MetadataCount = 0
 }
 
+// Bump increases the version by a specified version type.  There are helper
+// functions for bumping specific types as well.
 func (v *Version) Bump(bump int) error {
     switch bump {
     case MAJOR_VERSION:
@@ -67,18 +72,24 @@ func (v *Version) Bump(bump int) error {
     return nil
 }
 
+// Bumps the Major number of the version.
 func (v *Version) BumpMajor() error {
     return v.Bump(MAJOR_VERSION)
 }
 
+// Bumps the Minor number of the version.
 func (v *Version) BumpMinor() error {
     return v.Bump(MINOR_VERSION)
 }
 
+// Bumps the Patch number of the version.
 func (v *Version) BumpPatch() error {
     return v.Bump(PATCH_VERSION)
 }
 
+// Bumps the Pre-release number of the version.  Additionally if you don't set
+// the pre-release type (e.g. alpha, beta, etc), it will default the pre-release
+// type to alpha.
 func (v *Version) BumpPrerelease() error {
     if v.PrereleaseType == "" {
         v.SetPrerelease("alpha")
@@ -86,11 +97,15 @@ func (v *Version) BumpPrerelease() error {
     return v.Bump(PRERELEASE_VERSION)
 }
 
+// Bumps the build version by setting the metadata to "build" and increasing the
+// metadata count.
 func (v *Version) BumpBuild() error {
     v.SetMetadata("build")
     return v.Bump(BUILD_VERSION)
 }
 
+// Sets the metadata type.  Default metadata type is build, but any ascii
+// alphanumeric data may be used.
 func (v *Version) SetMetadata(metadata string) {
     if metadata != "" {
         v.Metadata = metadata
@@ -103,6 +118,7 @@ func (v *Version) SetMetadata(metadata string) {
     }
 }
 
+// Sets the prerelease type.  Should be alpha, beta, etc.  Defaults to "alpha"
 func (v *Version) SetPrerelease(prerelease string) {
     if prerelease != "" {
         v.PrereleaseType = prerelease
@@ -115,6 +131,7 @@ func (v *Version) SetPrerelease(prerelease string) {
     }
 }
 
+// Parses a version string.  Returns error on invalid version.
 func (v *Version) ParseString(version string) error {
     re := regexp.MustCompile(VERSION_FORMAT)
 
@@ -156,6 +173,7 @@ func (v *Version) ParseString(version string) error {
     return nil
 }
 
+// Returns a string representation of the version.
 func (v *Version) String() string {
     out := fmt.Sprintf("%d.%d.%d", v.Major, v.Minor, v.Patch)
 
@@ -169,13 +187,12 @@ func (v *Version) String() string {
     return out
 }
 
+// Returns a bool of whether this version is less than the version argument.
 func (v *Version) LessThan(v2 *Version) bool {
     var major = (v.Major == v2.Major)
     var minor = (v.Minor == v2.Minor)
     var patch = (v.Patch == v2.Patch)
     var base = (major && minor && patch)
-    var prerelease = (v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount == v2.PrereleaseCount)
-    var metadata = (v.Metadata == v2.Metadata && v.MetadataCount == v2.MetadataCount)
 
     if v.Major > v2.Major {
         return false
@@ -183,23 +200,18 @@ func (v *Version) LessThan(v2 *Version) bool {
         return false
     } else if major && minor && v.Patch > v2.Patch {
         return false
-    } else if base && metadata && (v.PrereleaseType == "" && v2.PrereleaseType != "") {
+    } else if base && (v.PrereleaseType == "" && v2.PrereleaseType != "") {
         return false
-    } else if base && metadata && (v.PrereleaseType > v2.PrereleaseType && (v.PrereleaseType != "" && v2.PrereleaseType != "")) {
+    } else if base && (v.PrereleaseType > v2.PrereleaseType && (v.PrereleaseType != "" && v2.PrereleaseType != "")) {
         return false
-    } else if base && metadata && (v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount > v2.PrereleaseCount) {
-        return false
-    } else if base && prerelease && (v.Metadata == "" && v2.Metadata != "") {
-        return false
-    } else if base && prerelease && (v.Metadata == v2.Metadata && v.MetadataCount > v2.MetadataCount) {
-        return false
-    } else if base && prerelease && (v.Metadata != "" && v2.PrereleaseType != "") {
+    } else if base && (v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount > v2.PrereleaseCount) {
         return false
     } else {
         return true
     }
 }
 
+// Returns a bool of whether this version is greater than the version argument.
 func (v *Version) GreaterThan(v2 *Version) bool {
     if !v.LessThan(v2) && !v.Equals(v2) {
         return true
@@ -208,10 +220,10 @@ func (v *Version) GreaterThan(v2 *Version) bool {
     }
 }
 
+// Returns a bool of whether this version is equal to the version argument.
 func (v *Version) Equals(v2 *Version) bool {
     if (v.Major == v2.Major && v.Minor == v2.Minor && v.Patch == v2.Patch) &&
-        ((v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount == v2.PrereleaseCount) &&
-            (v.Metadata == v2.Metadata && v.MetadataCount == v2.MetadataCount)) {
+        (v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount == v2.PrereleaseCount) {
         return true
     } else {
         return false
