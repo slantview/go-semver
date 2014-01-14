@@ -206,6 +206,8 @@ func (v *Version) LessThan(v2 *Version) bool {
         return false
     } else if base && (v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount > v2.PrereleaseCount) {
         return false
+    } else if v.Equals(v2) {
+        return false
     } else {
         return true
     }
@@ -222,8 +224,8 @@ func (v *Version) GreaterThan(v2 *Version) bool {
 
 // Returns a bool of whether this version is equal to the version argument.
 func (v *Version) Equals(v2 *Version) bool {
-    if (v.Major == v2.Major && v.Minor == v2.Minor && v.Patch == v2.Patch) &&
-        (v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount == v2.PrereleaseCount) {
+    if v.Major == v2.Major && v.Minor == v2.Minor && v.Patch == v2.Patch &&
+        v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount == v2.PrereleaseCount {
         return true
     } else {
         return false

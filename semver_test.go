@@ -285,6 +285,15 @@ func TestEqualsWithMetadata(t *testing.T) {
     }
 }
 
+func TestEqualsWithPrerelease(t *testing.T) {
+    v1, _ := NewVersion(BASE_VERSION)
+    v2, _ := NewVersion("1.0.0-alpha.1")
+
+    if v1.Equals(v2) {
+        t.Fatalf("v1 (%s) should not equal v2 (%s) with differing pre-release versions.", v1.String(), v2.String())
+    }
+}
+
 func TestComparison(t *testing.T) {
     var versions = []string{
         "0.0.9",         // Patch release
