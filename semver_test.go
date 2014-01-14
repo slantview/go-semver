@@ -12,6 +12,7 @@ var (
     BUMP_PRERELEASE_VERSION = "1.0.0-alpha.2"
     BUMP_BUILD_VERSION      = "1.0.0+build.2"
     ALL_FIELDS_VERSION      = "1.0.0-alpha.1+build.1"
+    INVALID_VERSION         = "zxv8d"
 )
 
 func TestNewSemver(t *testing.T) {
@@ -22,6 +23,11 @@ func TestNewSemver(t *testing.T) {
 
     if s == nil {
         t.Fatalf("Unable to allocate new version.")
+    }
+
+    _, err2 := NewVersion(INVALID_VERSION)
+    if err2 == nil {
+        t.Fatalf("Should throw error on invalid version.")
     }
 }
 
@@ -119,6 +125,19 @@ func TestPrereleaseVersion(t *testing.T) {
     }
 }
 
+func TestNonExplicitPrereleaseVersion(t *testing.T) {
+    s, err := NewVersion(BASE_VERSION)
+    if err != nil {
+        t.Fatalf("Unable to allocate new Version object: %s.", err)
+    }
+
+    s.BumpPrerelease()
+
+    if s.String() != BUMP_PRERELEASE_VERSION {
+        t.Fatalf("Unable to bump prerelease version.  Got %s, looking for %s.", s.String(), BUMP_PRERELEASE_VERSION)
+    }
+}
+
 func TestBuildVersion(t *testing.T) {
     s, err := NewVersion(BASE_VERSION)
     if err != nil {
@@ -129,6 +148,44 @@ func TestBuildVersion(t *testing.T) {
 
     if s.String() != BUMP_BUILD_VERSION {
         t.Fatalf("Unable to bump build version.  Got %s, looking for %s.", s.String(), BUMP_BUILD_VERSION)
+    }
+}
+
+func TestMetadata(t *testing.T) {
+    s, err := NewVersion(BASE_VERSION)
+    if err != nil {
+        t.Fatalf("Unable to allocate new Version object: %s.", err)
+    }
+
+    s.SetMetadata("dangerzone")
+
+    if s.Metadata != "dangerzone" {
+        t.Fatalf("Unable to set Metadata to 'dangerzone'")
+    }
+
+    s.SetMetadata("")
+
+    if s.Metadata != "build" {
+        t.Fatalf("Unable to default Metadata to 'build'")
+    }
+}
+
+func TestPrerelease(t *testing.T) {
+    s, err := NewVersion(BASE_VERSION)
+    if err != nil {
+        t.Fatalf("Unable to allocate new Version object: %s.", err)
+    }
+
+    s.SetPrerelease("beta")
+
+    if s.PrereleaseType != "beta" {
+        t.Fatalf("Unable to set PrereleaseType to 'beta'")
+    }
+
+    s.SetPrerelease("")
+
+    if s.PrereleaseType != "alpha" {
+        t.Fatalf("Unable to default PrereleaseType to 'alpha'")
     }
 }
 
@@ -176,13 +233,17 @@ func TestGreaterThan(t *testing.T) {
         "1.0.1", // Patch
         "1.1.0", // Minor
         "2.0.0", // Major
+        "1.1.5",
+        "2.10.0",
     }
 
     var versions_fail = []string{
-        "0.0.1",         // Patch
-        "0.1.0",         // Minor
-        "1.0.0-alpha.1", // Prerelease
-        "1.0.0+build.1", // Metadata
+        "0.0.1",          // Patch
+        "0.1.0",          // Minor
+        "1.0.0-alpha.1",  // Prerelease
+        "1.0.0+build.1",  // Metadata
+        "1.0.0-beta.3",   // Prerelease
+        "1.0.0+d34db33f", // Metadata
     }
 
     v1, _ := NewVersion(BASE_VERSION)
@@ -194,12 +255,25 @@ func TestGreaterThan(t *testing.T) {
         }
     }
 
+    for i := range versions {
+        v2, _ := NewVersion(versions[i])
+        if !v2.GreaterThan(v1) {
+            t.Fatalf("v2 (%s) should be greater than v1 (%s).", v2.String(), v1.String())
+        }
+    }
+
     for i := range versions_fail {
         v2, _ := NewVersion(versions_fail[i])
         if v2.GreaterThan(v1) {
             t.Fatalf("v1 (%s) should be greater than v2 (%s).", v1.String(), v2.String())
         }
+    }
 
+    for i := range versions_fail {
+        v2, _ := NewVersion(versions_fail[i])
+        if !v1.GreaterThan(v2) {
+            t.Fatalf("v1 (%s) should be greater than v2 (%s).", v1.String(), v2.String())
+        }
     }
 }
 
@@ -224,22 +298,36 @@ func TestLessThan(t *testing.T) {
         }
     }
 
+    for i := range versions {
+        v2, _ := NewVersion(versions[i])
+        if !v1.LessThan(v2) {
+            t.Fatalf("v1 (%s) should be less than v2 (%s).", v1.String(), v2.String())
+        }
+    }
+
     for i := range versions_fail {
         v2, _ := NewVersion(versions_fail[i])
         if v1.LessThan(v2) {
             t.Fatalf("v2 (%s) should be less than v1 (%s).", v2.String(), v1.String())
         }
+    }
 
+    for i := range versions_fail {
+        v2, _ := NewVersion(versions_fail[i])
+        if !v2.LessThan(v1) {
+            t.Fatalf("v2 (%s) should be less than v1 (%s).", v2.String(), v1.String())
+        }
     }
 }
 
 func TestEquals(t *testing.T) {
     var versions = []string{
-        "1.0.1",         // Patch
-        "1.1.0",         // Minor
-        "2.0.0",         // Major
-        "1.0.0-alpha.1", // Prerelease
-        "1.0.0+build.1", // Metadata
+        "1.0.1",                // Patch
+        "1.1.0",                // Minor
+        "2.0.0",                // Major
+        "1.0.0-alpha.1",        // Prerelease
+        "1.0.0+build.1",        // Metadata
+        "1.0.0-beta.1+build.3", // Prerelease + Metadata
     }
 
     for i := range versions {
@@ -258,6 +346,62 @@ func TestEquals(t *testing.T) {
 
         if v1.Equals(v2) {
             t.Fatalf("v1 (%s) should not equal v2 (%s).", v1.String(), v2.String())
+        }
+    }
+
+    for i := range versions {
+        for j := len(versions) - 1; j >= 0; j-- {
+            if i != j {
+                v1, _ := NewVersion(versions[i])
+                v2, _ := NewVersion(versions[j])
+
+                if v1.Equals(v2) {
+                    t.Fatalf("v1 (%s) should not equal v2 (%s).", v1.String(), v2.String())
+                }
+            }
+        }
+    }
+}
+
+func TestComparison(t *testing.T) {
+    var versions = []string{
+        "0.0.9", // Zeros
+        "0.1.0", // Major zero
+        //"1.0.0-alpha.1", // Prerelease TODO
+        "1.0.0", // Major release
+        "1.0.1", // Patch
+        "1.1.0", // Minor
+        "2.0.0", // Major
+
+    }
+
+    for i := range versions {
+        for j := len(versions) - 1; j >= 0; j-- {
+            v1, _ := NewVersion(versions[i])
+            v2, _ := NewVersion(versions[j])
+
+            if i < j {
+                if !v1.LessThan(v2) {
+                    t.Fatalf("v1 (%s) should be less than v2 (%s).", v1.String(), v2.String())
+                }
+                if v2.LessThan(v1) {
+                    t.Fatalf("v1 (%s) should be less than v2 (%s).", v1.String(), v2.String())
+                }
+            } else if i == j {
+                if !v1.Equals(v2) {
+                    t.Fatalf("v1 (%s) should equal v2 (%s).", v1.String(), v2.String())
+                }
+                if !v2.Equals(v1) {
+                    t.Fatalf("v1 (%s) should equal v2 (%s).", v1.String(), v2.String())
+                }
+            } else if i > j {
+                if !v1.GreaterThan(v2) {
+                    t.Fatalf("v1 (%s) should be greater than v2 (%s).", v1.String(), v2.String())
+                }
+                if v2.GreaterThan(v1) {
+                    t.Fatalf("v1 (%s) should be greater than v2 (%s).", v1.String(), v2.String())
+                }
+            }
         }
     }
 }

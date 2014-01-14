@@ -87,14 +87,11 @@ func (v *Version) BumpPrerelease() error {
 }
 
 func (v *Version) BumpBuild() error {
-    err := v.SetMetadata("build")
-    if err != nil {
-        return err
-    }
+    v.SetMetadata("build")
     return v.Bump(BUILD_VERSION)
 }
 
-func (v *Version) SetMetadata(metadata string) error {
+func (v *Version) SetMetadata(metadata string) {
     if metadata != "" {
         v.Metadata = metadata
     } else {
@@ -104,10 +101,9 @@ func (v *Version) SetMetadata(metadata string) error {
     if v.MetadataCount == 0 {
         v.MetadataCount = 1
     }
-    return nil
 }
 
-func (v *Version) SetPrerelease(prerelease string) error {
+func (v *Version) SetPrerelease(prerelease string) {
     if prerelease != "" {
         v.PrereleaseType = prerelease
     } else {
@@ -117,8 +113,6 @@ func (v *Version) SetPrerelease(prerelease string) error {
     if v.PrereleaseCount == 0 {
         v.PrereleaseCount = 1
     }
-
-    return nil
 }
 
 func (v *Version) ParseString(version string) error {
@@ -176,21 +170,28 @@ func (v *Version) String() string {
 }
 
 func (v *Version) LessThan(v2 *Version) bool {
+    var major = (v.Major == v2.Major)
+    var minor = (v.Minor == v2.Minor)
+    var patch = (v.Patch == v2.Patch)
+    var base = (major && minor && patch)
+
     if v.Major > v2.Major {
         return false
-    } else if v.Minor > v2.Minor {
+    } else if major && v.Minor > v2.Minor {
         return false
-    } else if v.Patch > v2.Patch {
+    } else if major && minor && v.Patch > v2.Patch {
         return false
-    } else if v.PrereleaseType == "" && v2.PrereleaseType != "" {
+    } else if base && (v.PrereleaseType == "" && v2.PrereleaseType != "") {
         return false
-    } else if v.PrereleaseType > v2.PrereleaseType && (v.PrereleaseType != "" && v2.PrereleaseType != "") {
+    } else if base && (v.PrereleaseType > v2.PrereleaseType && (v.PrereleaseType != "" && v2.PrereleaseType != "")) {
         return false
-    } else if v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount > v2.PrereleaseCount {
+    } else if base && (v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount > v2.PrereleaseCount) {
         return false
-    } else if v.Metadata == "" && v2.Metadata != "" {
+    } else if base && (v.Metadata == "" && v2.Metadata != "") {
         return false
-    } else if v.Metadata == v2.Metadata && v.MetadataCount > v2.MetadataCount {
+    } else if base && (v.Metadata == v2.Metadata && v.MetadataCount > v2.MetadataCount) {
+        return false
+    } else if base && (v.Metadata != "" && v2.PrereleaseType != "") {
         return false
     } else {
         return true
