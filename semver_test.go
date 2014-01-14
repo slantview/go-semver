@@ -9,8 +9,8 @@ var (
     BUMP_MAJOR_VERSION      = "2.0.0"
     BUMP_MINOR_VERSION      = "1.1.0"
     BUMP_PATCH_VERSION      = "1.0.1"
-    BUMP_PRERELEASE_VERSION = "1.0.0-alpha.2"
-    BUMP_BUILD_VERSION      = "1.0.0+build.2"
+    BUMP_PRERELEASE_VERSION = "1.0.0-alpha.1"
+    BUMP_BUILD_VERSION      = "1.0.0+build.1"
     ALL_FIELDS_VERSION      = "1.0.0-alpha.1+build.1"
     INVALID_VERSION         = "zxv8d"
     EMPTY_VERSION           = ""
@@ -296,16 +296,20 @@ func TestEqualsWithPrerelease(t *testing.T) {
 
 func TestComparison(t *testing.T) {
     var versions = []string{
-        "0.0.9",         // Patch release
-        "0.1.0",         // Minor release
-        "1.0.0-alpha.1", // Prerelease alpha
-        "1.0.0-beta.1",  // Prerelease beta
-        "1.0.0",         // Major release
-        "1.0.1-rc.1",    // Release candidate
-        "1.0.1-rc.2",    // Release candidate
-        "1.0.1",         // Patch
-        "1.1.0",         // Minor
-        "2.0.0",         // Major
+        "0.0.9",                // Patch release
+        "0.1.0",                // Minor release
+        "1.0.0-alpha",          // Prerelease alpha
+        "1.0.0-alpha.1",        // Prerelease alpha1
+        "1.0.0-beta.1",         // Prerelease beta1
+        "1.0.0-beta.2+build.1", // Prerelease + Metadata
+        "1.0.0-beta.11",        // Prerelease beta 11
+        "1.0.0-rc.1",           // Release candidate
+        "1.0.0",                // Major release
+        "1.0.1-rc.1",           // Release candidate
+        "1.0.1-rc.2",           // Release candidate
+        "1.0.1",                // Patch
+        "1.1.0",                // Minor
+        "2.0.0",                // Major
 
     }
 

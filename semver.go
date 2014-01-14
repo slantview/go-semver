@@ -112,10 +112,6 @@ func (v *Version) SetMetadata(metadata string) {
     } else {
         v.Metadata = "build"
     }
-
-    if v.MetadataCount == 0 {
-        v.MetadataCount = 1
-    }
 }
 
 // Sets the prerelease type.  Should be alpha, beta, etc.  Defaults to "alpha"
@@ -124,10 +120,6 @@ func (v *Version) SetPrerelease(prerelease string) {
         v.PrereleaseType = prerelease
     } else {
         v.PrereleaseType = "alpha"
-    }
-
-    if v.PrereleaseCount == 0 {
-        v.PrereleaseCount = 1
     }
 }
 
