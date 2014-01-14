@@ -5,15 +5,16 @@ import (
 )
 
 var (
-    BASE_VERSION            = "1.0.0"
-    BUMP_MAJOR_VERSION      = "2.0.0"
-    BUMP_MINOR_VERSION      = "1.1.0"
-    BUMP_PATCH_VERSION      = "1.0.1"
-    BUMP_PRERELEASE_VERSION = "1.0.0-alpha.1"
-    BUMP_BUILD_VERSION      = "1.0.0+build.1"
-    ALL_FIELDS_VERSION      = "1.0.0-alpha.1+build.1"
-    INVALID_VERSION         = "zxv8d"
-    EMPTY_VERSION           = ""
+    BASE_VERSION             = "1.0.0"
+    BUMP_MAJOR_VERSION       = "2.0.0"
+    BUMP_MINOR_VERSION       = "1.1.0"
+    BUMP_PATCH_VERSION       = "1.0.1"
+    BUMP_PRERELEASE_VERSION  = "1.0.0-alpha.1"
+    BUMP_PRERELEASE_VERSION2 = "1.0.0-alpha.2"
+    BUMP_BUILD_VERSION       = "1.0.0+build.1"
+    ALL_FIELDS_VERSION       = "1.0.0-alpha.1+build.1"
+    INVALID_VERSION          = "zxv8d"
+    EMPTY_VERSION            = ""
 )
 
 func TestNewSemver(t *testing.T) {
@@ -129,6 +130,15 @@ func TestPrereleaseVersion(t *testing.T) {
     if s.String() != BUMP_PRERELEASE_VERSION {
         t.Fatalf("Unable to bump prerelease version.  Got %s, looking for %s.", s.String(), BUMP_PRERELEASE_VERSION)
     }
+
+    s.Reset()
+    s.ParseString(BUMP_PRERELEASE_VERSION)
+    s.BumpPrerelease()
+
+    if s.String() != BUMP_PRERELEASE_VERSION2 {
+        t.Fatalf("Unable to bump prerelease version.  Got %s, looking for %s.", s.String(), BUMP_PRERELEASE_VERSION2)
+    }
+
 }
 
 func TestNonExplicitPrereleaseVersion(t *testing.T) {
@@ -325,6 +335,9 @@ func TestComparison(t *testing.T) {
                 if v2.LessThan(v1) {
                     t.Fatalf("v1 (%s) should be less than v2 (%s).", v1.String(), v2.String())
                 }
+                if v1.GreaterThan(v2) {
+                    t.Fatalf("v1 (%s) should be less than v2 (%s).", v1.String(), v2.String())
+                }
             } else if i == j {
                 if !v1.Equals(v2) {
                     t.Fatalf("v1 (%s) should equal v2 (%s).", v1.String(), v2.String())
@@ -332,11 +345,20 @@ func TestComparison(t *testing.T) {
                 if !v2.Equals(v1) {
                     t.Fatalf("v1 (%s) should equal v2 (%s).", v1.String(), v2.String())
                 }
+                if v1.LessThan(v2) {
+                    t.Fatalf("v1 (%s) should equal v2 (%s).", v1.String(), v2.String())
+                }
+                if v1.GreaterThan(v2) {
+                    t.Fatalf("v1 (%s) should equal v2 (%s).", v1.String(), v2.String())
+                }
             } else if i > j {
                 if !v1.GreaterThan(v2) {
                     t.Fatalf("v1 (%s) should be greater than v2 (%s).", v1.String(), v2.String())
                 }
                 if v2.GreaterThan(v1) {
+                    t.Fatalf("v1 (%s) should be greater than v2 (%s).", v1.String(), v2.String())
+                }
+                if v1.LessThan(v2) {
                     t.Fatalf("v1 (%s) should be greater than v2 (%s).", v1.String(), v2.String())
                 }
             }
