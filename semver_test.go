@@ -365,13 +365,16 @@ func TestEquals(t *testing.T) {
 
 func TestComparison(t *testing.T) {
     var versions = []string{
-        "0.0.9", // Zeros
-        "0.1.0", // Major zero
-        //"1.0.0-alpha.1", // Prerelease TODO
-        "1.0.0", // Major release
-        "1.0.1", // Patch
-        "1.1.0", // Minor
-        "2.0.0", // Major
+        "0.0.9",         // Patch release
+        "0.1.0",         // Minor release
+        "1.0.0-alpha.1", // Prerelease alpha
+        "1.0.0-beta.1",  // Prerelease beta
+        "1.0.0",         // Major release
+        "1.0.1-rc.1",    // Release candidate
+        "1.0.1-rc.2",    // Release candidate
+        "1.0.1",         // Patch
+        "1.1.0",         // Minor
+        "2.0.0",         // Major
 
     }
 

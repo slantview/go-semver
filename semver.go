@@ -174,6 +174,8 @@ func (v *Version) LessThan(v2 *Version) bool {
     var minor = (v.Minor == v2.Minor)
     var patch = (v.Patch == v2.Patch)
     var base = (major && minor && patch)
+    var prerelease = (v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount == v2.PrereleaseCount)
+    var metadata = (v.Metadata == v2.Metadata && v.MetadataCount == v2.MetadataCount)
 
     if v.Major > v2.Major {
         return false
@@ -181,17 +183,17 @@ func (v *Version) LessThan(v2 *Version) bool {
         return false
     } else if major && minor && v.Patch > v2.Patch {
         return false
-    } else if base && (v.PrereleaseType == "" && v2.PrereleaseType != "") {
+    } else if base && metadata && (v.PrereleaseType == "" && v2.PrereleaseType != "") {
         return false
-    } else if base && (v.PrereleaseType > v2.PrereleaseType && (v.PrereleaseType != "" && v2.PrereleaseType != "")) {
+    } else if base && metadata && (v.PrereleaseType > v2.PrereleaseType && (v.PrereleaseType != "" && v2.PrereleaseType != "")) {
         return false
-    } else if base && (v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount > v2.PrereleaseCount) {
+    } else if base && metadata && (v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount > v2.PrereleaseCount) {
         return false
-    } else if base && (v.Metadata == "" && v2.Metadata != "") {
+    } else if base && prerelease && (v.Metadata == "" && v2.Metadata != "") {
         return false
-    } else if base && (v.Metadata == v2.Metadata && v.MetadataCount > v2.MetadataCount) {
+    } else if base && prerelease && (v.Metadata == v2.Metadata && v.MetadataCount > v2.MetadataCount) {
         return false
-    } else if base && (v.Metadata != "" && v2.PrereleaseType != "") {
+    } else if base && prerelease && (v.Metadata != "" && v2.PrereleaseType != "") {
         return false
     } else {
         return true
@@ -199,21 +201,7 @@ func (v *Version) LessThan(v2 *Version) bool {
 }
 
 func (v *Version) GreaterThan(v2 *Version) bool {
-    if v.Major > v2.Major {
-        return true
-    } else if (v.Major == v2.Major) && v.Minor > v2.Minor {
-        return true
-    } else if (v.Major == v2.Major) && (v.Minor == v2.Minor) && v.Patch > v2.Patch {
-        return true
-    } else if v.PrereleaseType == "" && v2.PrereleaseType != "" {
-        return true
-    } else if (v.PrereleaseType > v2.PrereleaseType) && (v.PrereleaseType != "" && v2.PrereleaseType != "") {
-        return true
-    } else if v.PrereleaseType == v2.PrereleaseType && v.PrereleaseCount > v2.PrereleaseCount {
-        return true
-    } else if v.Metadata == "" && v2.Metadata != "" {
-        return true
-    } else if v.Metadata == v2.Metadata && v.MetadataCount > v2.MetadataCount {
+    if !v.LessThan(v2) && !v.Equals(v2) {
         return true
     } else {
         return false
